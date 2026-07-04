@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>建て替え費用シミュレーター</title>
+<style>
+  :root {
+    --bg: #faf9f5;
+    --card: #ffffff;
+    --text: #1a1a17;
+    --text-sub: #6b6a64;
+    --border: #e3e1d9;
+    --accent: #0f6e56;
+    --ok: #0f6e56;
+    --warn: #a05a00;
+    --danger: #b3261e;
+    --ok-bg: #e1f5ee;
+    --warn-bg: #faeeda;
+    --danger-bg: #fcebeb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1b;
+      --card: #2a2a26;
+      --text: #f0efe9;
+      --text-sub: #a3a29a;
+      --border: #44443f;
+      --accent: #5dcaa5;
+      --ok: #5dcaa5;
+      --warn: #fac775;
+      --danger: #f09595;
+      --ok-bg: #143b30;
+      --warn-bg: #3d2f14;
+      --danger-bg: #401e1c;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px 16px 48px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--text-sub); margin-bottom: 20px; }
+
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .presets button {
+    font-size: 13px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .presets button.active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .presets button:active { transform: scale(0.97); }
+
+  .results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .result-card .label { font-size: 12px; color: var(--text-sub); margin-bottom: 2px; }
+  .result-card .value { font-size: 24px; font-weight: 600; }
+  .result-card .value small { font-size: 14px; font-weight: 400; }
+  .result-card.primary { border-color: var(--accent); }
+
+  .verdict {
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .verdict.ok { background: var(--ok-bg); color: var(--ok); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .verdict.danger { background: var(--danger-bg); color: var(--danger); }
+
+  .sliders {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+  }
+  .slider-row { margin-bottom: 18px; }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .slider-head label { font-size: 13px; color: var(--text-sub); }
+  .slider-head .val { font-size: 16px; font-weight: 600; }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 3px; background: var(--border);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent);
+    margin-top: -9px;
+    border: 3px solid var(--card);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  input[type="range"]::-moz-range-track {
+    height: 6px; border-radius: 3px; background: var(--border);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--card);
+  }
+
+  .breakdown {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+  .breakdown h2 { font-size: 13px; color: var(--text-sub); font-weight: 500; margin-bottom: 8px; }
+  .breakdown table { width: 100%; font-size: 14px; border-collapse: collapse; }
+  .breakdown td { padding: 5px 0; }
+  .breakdown td:last-child { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .breakdown tr.income td:last-child { color: var(--ok); }
+  .breakdown tr.total td { border-top: 1px solid var(--border); padding-top: 8px; font-weight: 600; }
+
+  .notes { font-size: 11px; color: var(--text-sub); line-height: 1.7; }
+  .notes li { margin-left: 1.2em; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>建て替え費用シミュレーター</h1>
+  <p class="subtitle">ローン・仕送り・税金を合わせた毎月の負担額を試算できます</p>
+
+  <div class="presets" id="presets">
+    <button data-preset="wood">木造案（7,000万円）</button>
+    <button data-preset="rc">RC案（1.1億円）</button>
+    <button data-preset="rent">木造＋賃貸中（将来）</button>
+  </div>
+
+  <div class="results">
+    <div class="result-card primary">
+      <div class="label">月間総負担（実質）</div>
+      <div class="value"><span id="total-out">—</span><small> 万円</small></div>
+    </div>
+    <div class="result-card">
+      <div class="label">手取りに占める割合</div>
+      <div class="value"><span id="ratio-out">—</span><small> %</small></div>
+    </div>
+    <div class="result-card">
+      <div class="label">月々のローン返済</div>
+      <div class="value"><span id="pay-out">—</span><small> 万円</small></div>
+    </div>
+    <div class="result-card">
+      <div class="label">総返済額（利息込み）</div>
+      <div class="value"><span id="grand-out">—</span><small> 万円</small></div>
+    </div>
+  </div>
+
+  <div class="verdict ok" id="verdict"></div>
+
+  <div class="sliders">
+    <div class="slider-row">
+      <div class="slider-head"><label for="loan">借入額</label><span class="val"><span id="loan-out">7,000</span> 万円</span></div>
+      <input type="range" id="loan" min="3000" max="13000" step="100" value="7000">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="rate">金利（年）</label><span class="val"><span id="rate-out">1.10</span> %</span></div>
+      <input type="range" id="rate" min="0.5" max="3.5" step="0.05" value="1.1">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="years">返済期間</label><span class="val"><span id="years-out">35</span> 年</span></div>
+      <input type="range" id="years" min="15" max="40" step="1" value="35">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="support">両親への仕送り</label><span class="val"><span id="support-out">8.0</span> 万円/月</span></div>
+      <input type="range" id="support" min="0" max="20" step="0.5" value="8">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="tax">固定資産税・都市計画税</label><span class="val"><span id="tax-out">58</span> 万円/年</span></div>
+      <input type="range" id="tax" min="30" max="110" step="1" value="58">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="repair">修繕積立（任意の貯蓄）</label><span class="val"><span id="repair-out">1.5</span> 万円/月</span></div>
+      <input type="range" id="repair" min="0" max="4" step="0.5" value="1.5">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="rent">賃貸収入</label><span class="val"><span id="rent-out">0.0</span> 万円/月</span></div>
+      <input type="range" id="rent" min="0" max="30" step="0.5" value="0">
+    </div>
+    <div class="slider-row">
+      <div class="slider-head"><label for="income">世帯手取り</label><span class="val"><span id="income-out">100</span> 万円/月</span></div>
+      <input type="range" id="income" min="60" max="150" step="1" value="100">
+    </div>
+  </div>
+
+  <div class="breakdown">
+    <h2>月間負担の内訳</h2>
+    <table>
+      <tr><td>ローン返済</td><td id="b-loan">—</td></tr>
+      <tr><td>両親への仕送り</td><td id="b-support">—</td></tr>
+      <tr><td>固定資産税（月割）</td><td id="b-tax">—</td></tr>
+      <tr><td>修繕積立</td><td id="b-repair">—</td></tr>
+      <tr class="income"><td>賃貸収入（差引）</td><td id="b-rent">—</td></tr>
+      <tr class="total"><td>月間総負担（実質）</td><td id="b-total">—</td></tr>
+    </table>
+  </div>
+
+  <ul class="notes">
+    <li>ローンは元利均等返済で計算しています。</li>
+    <li>負担率の目安：25%以下なら余裕あり、25〜35%は成立圏内、35%超は要見直し。</li>
+    <li>金利・建築費は2026年7月時点の相場に基づく概算です。実際の金額は見積もり・審査で確定します。</li>
+  </ul>
+</div>
+
+<script>
+(function () {
+  var ids = ["loan", "rate", "years", "support", "tax", "repair", "rent", "income"];
+
+  var presets = {
+    wood: { loan: 7000, rate: 1.1, years: 35, support: 8, tax: 58, repair: 1.5, rent: 0, income: 100 },
+    rc:   { loan: 11000, rate: 1.1, years: 35, support: 8, tax: 80, repair: 1, rent: 0, income: 100 },
+    rent: { loan: 7000, rate: 1.1, years: 35, support: 0, tax: 62, repair: 2.5, rent: 20, income: 100 }
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function fmt(n) { return Math.round(n).toLocaleString("ja-JP"); }
+
+  function calc() {
+    var L = +$("loan").value, R = +$("rate").value, Y = +$("years").value;
+    var S = +$("support").value, T = +$("tax").value, M = +$("repair").value;
+    var RENT = +$("rent").value, I = +$("income").value;
+
+    $("loan-out").textContent = fmt(L);
+    $("rate-out").textContent = R.toFixed(2);
+    $("years-out").textContent = Y;
+    $("support-out").textContent = S.toFixed(1);
+    $("tax-out").textContent = T;
+    $("repair-out").textContent = M.toFixed(1);
+    $("rent-out").textContent = RENT.toFixed(1);
+    $("income-out").textContent = I;
+
+    var r = R / 100 / 12, n = Y * 12;
+    var pay = r > 0 ? L * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : L / n;
+    var total = pay + S + T / 12 + M - RENT;
+    var ratio = total / I * 100;
+
+    $("pay-out").textContent = pay.toFixed(1);
+    $("total-out").textContent = total.toFixed(1);
+    $("ratio-out").textContent = ratio.toFixed(0);
+    $("grand-out").textContent = fmt(pay * n);
+
+    $("b-loan").textContent = pay.toFixed(1) + " 万円";
+    $("b-support").textContent = S.toFixed(1) + " 万円";
+    $("b-tax").textContent = (T / 12).toFixed(1) + " 万円";
+    $("b-repair").textContent = M.toFixed(1) + " 万円";
+    $("b-rent").textContent = RENT > 0 ? "−" + RENT.toFixed(1) + " 万円" : "0 万円";
+    $("b-total").textContent = total.toFixed(1) + " 万円";
+
+    var v = $("verdict");
+    if (ratio <= 25) {
+      v.className = "verdict ok";
+      v.textContent = "負担率25%以下：貯蓄・教育費の余力を十分に残せる水準です。";
+    } else if (ratio <= 35) {
+      v.className = "verdict warn";
+      v.textContent = "負担率25〜35%：成立しますが、育休などで収入が減る時期の耐性を確認しておきたい水準です。";
+    } else {
+      v.className = "verdict danger";
+      v.textContent = "負担率35%超：家計の余力がほぼなくなる水準です。借入額の圧縮か条件の見直しを推奨します。";
+    }
+  }
+
+  function applyPreset(name) {
+    var p = presets[name];
+    Object.keys(p).forEach(function (k) { $(k).value = p[k]; });
+    document.querySelectorAll("#presets button").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.preset === name);
+    });
+    calc();
+  }
+
+  document.querySelectorAll("#presets button").forEach(function (b) {
+    b.addEventListener("click", function () { applyPreset(b.dataset.preset); });
+  });
+
+  ids.forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      document.querySelectorAll("#presets button").forEach(function (b) { b.classList.remove("active"); });
+      calc();
+    });
+  });
+
+  applyPreset("wood");
+})();
+</script>
+</body>
+</html>
