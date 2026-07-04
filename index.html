@@ -103,7 +103,31 @@
   .slider-row:last-child { margin-bottom: 0; }
   .slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
   .slider-head label { font-size: 13px; color: var(--text-sub); }
-  .slider-head .val { font-size: 16px; font-weight: 600; }
+  .slider-head .val { font-size: 14px; color: var(--text-sub); white-space: nowrap; }
+  .slider-head input[type="number"] {
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--border);
+    border-radius: 0;
+    width: 5em;
+    text-align: right;
+    padding: 0 2px 1px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .slider-head input[type="number"]::-webkit-outer-spin-button,
+  .slider-head input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .slider-head input[type="number"]:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -183,35 +207,35 @@
 
   <div class="sliders">
     <div class="slider-row">
-      <div class="slider-head"><label for="loan">借入額</label><span class="val"><span id="loan-out">7,000</span> 万円</span></div>
+      <div class="slider-head"><label for="loan">借入額</label><span class="val"><input type="number" id="loan-num" min="500" max="20000" step="100" inputmode="numeric" aria-label="借入額（万円）"> 万円</span></div>
       <input type="range" id="loan" min="3000" max="13000" step="100" value="7000">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="rate">金利（年）</label><span class="val"><span id="rate-out">1.10</span> %</span></div>
+      <div class="slider-head"><label for="rate">金利（年）</label><span class="val"><input type="number" id="rate-num" min="0.1" max="10" step="0.01" inputmode="decimal" aria-label="金利（年%）"> %</span></div>
       <input type="range" id="rate" min="0.5" max="3.5" step="0.05" value="1.1">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="years">返済期間</label><span class="val"><span id="years-out">35</span> 年</span></div>
+      <div class="slider-head"><label for="years">返済期間</label><span class="val"><input type="number" id="years-num" min="1" max="50" step="1" inputmode="numeric" aria-label="返済期間（年）"> 年</span></div>
       <input type="range" id="years" min="15" max="40" step="1" value="35">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="support">両親への仕送り</label><span class="val"><span id="support-out">8.0</span> 万円/月</span></div>
+      <div class="slider-head"><label for="support">両親への仕送り</label><span class="val"><input type="number" id="support-num" min="0" max="50" step="0.5" inputmode="decimal" aria-label="仕送り（万円/月）"> 万円/月</span></div>
       <input type="range" id="support" min="0" max="20" step="0.5" value="8">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="tax">固定資産税・都市計画税</label><span class="val"><span id="tax-out">58</span> 万円/年</span></div>
+      <div class="slider-head"><label for="tax">固定資産税・都市計画税</label><span class="val"><input type="number" id="tax-num" min="0" max="300" step="1" inputmode="numeric" aria-label="固都税（万円/年）"> 万円/年</span></div>
       <input type="range" id="tax" min="30" max="110" step="1" value="58">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="repair">修繕積立（任意の貯蓄）</label><span class="val"><span id="repair-out">1.5</span> 万円/月</span></div>
+      <div class="slider-head"><label for="repair">修繕積立（任意の貯蓄）</label><span class="val"><input type="number" id="repair-num" min="0" max="20" step="0.5" inputmode="decimal" aria-label="修繕積立（万円/月）"> 万円/月</span></div>
       <input type="range" id="repair" min="0" max="4" step="0.5" value="1.5">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="rent">賃貸収入</label><span class="val"><span id="rent-out">0.0</span> 万円/月</span></div>
+      <div class="slider-head"><label for="rent">賃貸収入</label><span class="val"><input type="number" id="rent-num" min="0" max="100" step="0.5" inputmode="decimal" aria-label="賃貸収入（万円/月）"> 万円/月</span></div>
       <input type="range" id="rent" min="0" max="30" step="0.5" value="0">
     </div>
     <div class="slider-row">
-      <div class="slider-head"><label for="income">世帯手取り</label><span class="val"><span id="income-out">100</span> 万円/月</span></div>
+      <div class="slider-head"><label for="income">世帯手取り</label><span class="val"><input type="number" id="income-num" min="10" max="500" step="1" inputmode="numeric" aria-label="世帯手取り（万円/月）"> 万円/月</span></div>
       <input type="range" id="income" min="60" max="150" step="1" value="100">
     </div>
   </div>
@@ -229,6 +253,7 @@
   </div>
 
   <ul class="notes">
+    <li>数値は直接入力もできます（スライダーの範囲を超える値もOK）。</li>
     <li>ローンは元利均等返済で計算しています。</li>
     <li>負担率の目安：25%以下なら余裕あり、25〜35%は成立圏内、35%超は要見直し。</li>
     <li>金利・建築費は2026年7月時点の相場に基づく概算です。実際の金額は見積もり・審査で確定します。</li>
@@ -245,22 +270,29 @@
     rent: { loan: 7000, rate: 1.1, years: 35, support: 0, tax: 62, repair: 2.5, rent: 20, income: 100 }
   };
 
+  var state = {};
+
   function $(id) { return document.getElementById(id); }
   function fmt(n) { return Math.round(n).toLocaleString("ja-JP"); }
 
-  function calc() {
-    var L = +$("loan").value, R = +$("rate").value, Y = +$("years").value;
-    var S = +$("support").value, T = +$("tax").value, M = +$("repair").value;
-    var RENT = +$("rent").value, I = +$("income").value;
+  function clampToNum(id, v) {
+    var num = $(id + "-num");
+    var min = parseFloat(num.min), max = parseFloat(num.max);
+    if (isNaN(v)) return parseFloat($(id).value);
+    return Math.min(max, Math.max(min, v));
+  }
 
-    $("loan-out").textContent = fmt(L);
-    $("rate-out").textContent = R.toFixed(2);
-    $("years-out").textContent = Y;
-    $("support-out").textContent = S.toFixed(1);
-    $("tax-out").textContent = T;
-    $("repair-out").textContent = M.toFixed(1);
-    $("rent-out").textContent = RENT.toFixed(1);
-    $("income-out").textContent = I;
+  function setValue(id, v, source) {
+    v = clampToNum(id, v);
+    state[id] = v;
+    if (source !== "num") $(id + "-num").value = v;
+    if (source !== "range") $(id).value = v;
+  }
+
+  function calc() {
+    var L = state.loan, R = state.rate, Y = state.years;
+    var S = state.support, T = state.tax, M = state.repair;
+    var RENT = state.rent, I = state.income;
 
     var r = R / 100 / 12, n = Y * 12;
     var pay = r > 0 ? L * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : L / n;
@@ -292,9 +324,13 @@
     }
   }
 
+  function clearActive() {
+    document.querySelectorAll("#presets button").forEach(function (b) { b.classList.remove("active"); });
+  }
+
   function applyPreset(name) {
     var p = presets[name];
-    Object.keys(p).forEach(function (k) { $(k).value = p[k]; });
+    Object.keys(p).forEach(function (k) { setValue(k, p[k]); });
     document.querySelectorAll("#presets button").forEach(function (b) {
       b.classList.toggle("active", b.dataset.preset === name);
     });
@@ -307,8 +343,26 @@
 
   ids.forEach(function (id) {
     $(id).addEventListener("input", function () {
-      document.querySelectorAll("#presets button").forEach(function (b) { b.classList.remove("active"); });
+      clearActive();
+      setValue(id, parseFloat($(id).value), "range");
       calc();
+    });
+
+    var num = $(id + "-num");
+    num.addEventListener("input", function () {
+      var v = parseFloat(num.value);
+      if (isNaN(v)) return;
+      clearActive();
+      setValue(id, v, "num");
+      calc();
+    });
+    num.addEventListener("blur", function () {
+      var v = parseFloat(num.value);
+      setValue(id, isNaN(v) ? state[id] : v);
+      calc();
+    });
+    num.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") num.blur();
     });
   });
 
